@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from "react";
 
 // Usage
 function App() {
-  const { execute, pending, value, error } = useAsync(myFunction, true);
+  const { execute, pending, value, error } = useAsync(myFunction, false); //Executed on Demand and not immediate
+
+  const { value: valueI, error: errorI } = useAsync(anotherAPICall, true)
 
   return (
     <div>
@@ -12,8 +14,16 @@ function App() {
               style={{ marginRight: "5px" }}
             />)}</span>
       </button>
-      {value && <div>{value}</div>}
-      {error && <div>{error}</div>}
+      <section>
+        {'Not Immediate :----->'}
+        {value && <div style={{"color":"green"}}>{value}</div>}
+        {error && <div style={{"color":"red"}}>{error}</div>}
+      </section>
+      <section>
+        {'Immediate :----->'}
+        {valueI && <div style={{"color":"green"}}>{valueI}</div>}
+        {errorI && <div style={{"color":"red"}}>{errorI}</div>}
+      </section>
     </div>
   );
 }
@@ -27,6 +37,19 @@ const myFunction = () => {
       rnd <= 5
         ? resolve("Submitted successfully 🙌")
         : reject("Oh no there was an error 😞");
+    }, 2000);
+  });
+};
+
+// An async function for testing our hook.
+// Will be successful 50% of the time.
+const anotherAPICall = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const rnd = Math.random() * 10;
+      rnd <= 5
+        ? resolve("Immediate Execution - Submitted successfully 🙌")
+        : reject("Immediate Execution - Oh no there was an error 😞");
     }, 2000);
   });
 };
