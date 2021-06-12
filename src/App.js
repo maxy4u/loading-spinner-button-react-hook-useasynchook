@@ -1,15 +1,27 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
+import axios from "axios";
 
 // Usage
+
+ const MyTable = memo(({data})=>(
+    <table>
+      <thead><tr><th>Id</th><th>Name</th><th>Description</th></tr></thead>
+      {data.map(({userId, id, title, body })=>(<tr><td>{id}</td><td>{name}</td><td>{body}</td></tr>))}
+    </table>
+  ));
+
+
 function App() {
   const { execute, pending, value, error } = useAsync(myFunction, false); //Executed on Demand and not immediate
 
   const { value: valueI, error: errorI } = useAsync(anotherAPICall, true)
 
+  const { execute: executeA, pending: pendingA, value: valueA, error: errorA } = useAsync(tempFetcher, false);
+
   return (
     <div>
-      <button className="button" onClick={execute} disabled={pending}>
-        <span>Submit {pending && (<i
+      <button className="button" onClick={executeA} disabled={pendingA}>
+        <span>Submit {pendingA && (<i
               className="fa fa-refresh fa-spin"
               style={{ marginRight: "5px" }}
             />)}</span>
@@ -24,6 +36,13 @@ function App() {
         {valueI && <div style={{"color":"green"}}>{valueI}</div>}
         {errorI && <div style={{"color":"red"}}>{errorI}</div>}
       </section>
+
+      <section>
+        {'Not Immediate  with actual data:----->'}
+        {valueA && <MyTable data={valueA}/>}
+        {errorA && <div style={{"color":"red"}}>{errorA}</div>}
+      </section>
+
     </div>
   );
 }
@@ -40,6 +59,13 @@ const myFunction = () => {
     }, 2000);
   });
 };
+
+const tempFetcher = async () => {
+    const { data } = await axios.get(
+      "https://jsonplaceholder.typicode.com/posts"
+    );
+    return data;
+  }
 
 // An async function for testing our hook.
 // Will be successful 50% of the time.
